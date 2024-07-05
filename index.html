@@ -1,9 +1,10 @@
 
+<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ตรวจสอบ Personal Level และกลุ่มเงินเดือน</title>
+    <title>PL Culculator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -83,8 +84,8 @@
 <body>
 
     <div class="container">
-        <h2>ระบบคำนวน Personal Level</h2>
-        <input type="number" id="salaryInput" placeholder="กรอกจำนวนเงิน" onkeydown="if(event.keyCode === 13) calculate()" />
+        <h2>PL Calculator (V 1.00)</h2>
+        <input type="text" id="salaryInput" placeholder="กรอกจำนวนเงิน" />
         <div>
             <button onclick="calculate()">คำนวณ</button>
             <button class="lg" onclick="clearInput()">ล้างข้อมูล</button>
@@ -117,14 +118,22 @@
             "PL 41": [[0, 27000], [27000, 31000], [31000, 35000], [35000, 39000], [39000, 43000], [43000, Infinity]],
         };
 
+        function formatNumber(number) {
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        function parseNumber(numberString) {
+            return parseFloat(numberString.replace(/,/g, ''));
+        }
+
         function findGroupForPersonalLevels(salary) {
             const results = [];
             for (const personalLevel in personalLevels) {
                 for (let i = 0; i < personalLevels[personalLevel].length; i++) {
                     if (salary >= personalLevels[personalLevel][i][0] && salary < personalLevels[personalLevel][i][1]) {
                         const minSalary = personalLevels[personalLevel][i][0];
-                        const maxSalary = personalLevels[personalLevel][i][1] === Infinity ? "ขึ้นไป" : personalLevels[personalLevel][i][1];
-                        results.push({ personalLevel: personalLevel, group: `G${i + 1}`, groupNo: i + 1, range: `${minSalary} - ${maxSalary}` });
+                        const maxSalary = personalLevels[personalLevel][i][1] === Infinity ? "ขึ้นไป" : formatNumber(personalLevels[personalLevel][i][1]);
+                        results.push({ personalLevel: personalLevel, group: `G${i + 1}`, groupNo: i + 1, range: `${formatNumber(minSalary)} - ${maxSalary}` });
                         break;
                     }
                 }
@@ -133,9 +142,10 @@
         }
 
         function calculate() {
-            const salary = parseFloat(document.getElementById("salaryInput").value);
+            const salaryString = document.getElementById("salaryInput").value;
+            const salary = parseNumber(salaryString);
             if (isNaN(salary) || salary <= 0) {
-                alert("กรุณากรอกจำนวนเงินที่ถูกต้อง");
+                alert("กรอกข้อมูลจำนวนเงิน");
                 return;
             }
 
@@ -190,6 +200,13 @@
             document.getElementById("resultTable").style.display = 'none';
         }
 
+        // Format number on input change
+        document.getElementById("salaryInput").addEventListener("input", function(event) {
+            const value = event.target.value.replace(/,/g, '');
+            const formattedValue = formatNumber(value);
+            event.target.value = formattedValue;
+        });
+
         // ตรวจจับการกดปุ่ม Enter
         document.getElementById("salaryInput").addEventListener("keydown", function(event) {
             if (event.key === "Enter") {
@@ -200,5 +217,10 @@
 
 </body>
 </html>
+
+
+
+
+
 
 
